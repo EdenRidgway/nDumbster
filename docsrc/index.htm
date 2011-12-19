@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<title>nDumbster - C# .Net Fake SMTP Server</title>
+		<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+		<link rel="stylesheet" href="ndumbster.css" type="text/css">
+	</head>
+	<body>
+		<img style="WIDTH: 509px; HEIGHT: 102px" alt="nDumbster, .Net C# SMTP Fake server" src="nDumbsterLogo.gif"><br>
+		<h1>.Net Email Testing</h1>
+		<h2>Introduction</h2>
+		<p>
+			nDumbster is a simple fake SMTP based on the original Dumbster java sourcecode. 
+			It has been ported&nbsp; to C# to enable .Net developper to unit test 
+			applications that send email messages.</p>
+		<p>
+			nDumbster support all standard SMTP commands but instead of delivering messages 
+			to the user, it stores then in memory so they can be tested later.</p>
+		<p>Compared to other testing strategies such as mock objects, nDumbster can be used 
+			to validate our system configuration up to the SMTP protocol. As it acts like a 
+			real SMTP server, it validate that you use correctly your mail sending 
+			component.</p>
+		<p>
+			nDumbster provide means to fetch messages send by your programs, and&nbsp; to 
+			check any properties of these messages.
+		</p>
+		<p>
+			nDumbster is written in C# and is open source. According to Dumbster license, 
+			it is distributed under the <a href="http://www.opensource.org/licenses/apache2.0.txt">
+				Apache License 2.0</a>.</p>
+		<p>
+			nDumbter has been tested with .Net Framework version 1.1 and 2.0, and should be 
+			easilly compiled with .Net 1.0 or Mono.<BR>
+		</p>
+		<H2>Examples</H2>
+		<P>The following examples shows how to use nDumbster and <A href="http://www.nunit.org/">
+				NUnit</A> to test how your function sendMessage.
+		</P>
+		<PRE>[TestFixture]<BR>public class SimpleSmtpServerTest<BR>{<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; SimpleSmtpServer smtpServer;<BR><BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [SetUp]<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public void Setup()<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<BR><BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; smtpServer = SimpleSmtpServer.Start();<BR><BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<BR><BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [TearDown]<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public void TearDown()<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; smtpServer.Stop();<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<BR><BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [Test]<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public void SendEmail()<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // Use you own code&nbsp;<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; sendMessage(25, "sender@here.com", "Test", "Test Body", "receiver@there.com");<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Assert.AreEqual(1, smtpServer.ReceivedEmailCount, "1 mails sent");<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; SmtpMessage mail= (SmtpMessage)smtpServer.ReceivedEmail[0];<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Assert.AreEqual("&lt;receiver@there.com&gt;",&nbsp;mail.Headers["To"], "Receiver");<BR>&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; Assert.AreEqual("&lt;sender@here.com&gt;",&nbsp;mail.Headers["From"], "Sender");<BR>&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; Assert.AreEqual("Test",&nbsp;mail.Headers["Subject"], "Subject");<BR><BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Assert.AreEqual("Test Body", mailUser.Body, "Body");<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<BR>}</PRE>
+		<H2>Download</H2>
+		<P>nDumbster can be downloaded from <A href="http://sourceforge.net/projects/ndumbster">sourceforge 
+				site</A>.<BR>
+			<BR>
+			<BR>
+		</P>
+	</body>
+</html>

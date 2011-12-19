@@ -1,0 +1,3 @@
+This is a fork of nDumbster, the fake SMTP server, that was originally hosted at: http://ndumbster.sourceforge.net/default.html.
+
+The project has been upgraded to .Net 4.0 and also takes advantages of some new concurrency features in the framework.
