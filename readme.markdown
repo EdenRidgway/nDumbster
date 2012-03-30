@@ -33,7 +33,7 @@ var server = SimpleSmtpServer.Start();
 SmtpMail.SmtpServer = "localhost";
 SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
 
-Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
+Assert.AreEqual(1, server.ReceivedEmail.Count());
 
 var email = server.ReceivedEmail.First();
 
