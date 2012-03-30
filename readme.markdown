@@ -11,18 +11,20 @@ Enhancements
 Apart from being upgraded to .Net 4.0 the following improvements have been made to the library:
 
     1. The locking issues that lead to slow test times have been removed by using the ConcurrentQueue
-	2. Fixed the race condition issue in the code (sending back an SMTP finished before saving the message) that meant that Assertions made after an SMTP send could fail from time to time.
+	2. Fixed the race condition issue in the code (sending back an SMTP finished before saving the message) 
+	   that meant that Assertions made after an SMTP send could fail from time to time.
     3. Generics have been used instead of ArrayLists
-	4. Messags are now returned as OpenPop messages which allow you to query the various messages parts far more easily, such as:
-		i. Headers are strongly typed
-		ii. Text versus HTML versions can be extracted and compared
-		iii. Attachment handling actually exists
-		iv. Media Types
-		v. Lists of TO/CC/BCC email addresses
+	4. Messags are now returned as OpenPop messages which allow you to query the various messages 
+	   parts far more easily, such as:
+		* Headers are strongly typed
+		* Text versus HTML versions can be extracted and compared
+		* Attachment handling actually exists
+		* Media Types
+		* Lists of TO/CC/BCC email addresses
 	
 Example test:
 
-```C#
+```c#
 SmtpMail.SmtpServer = "localhost";
 SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
 
