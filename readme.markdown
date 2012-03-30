@@ -21,10 +21,15 @@ Apart from being upgraded to .Net 4.0 the following improvements have been made 
 	* Attachment handling actually exists
 	* Media Types
 	* Lists of TO/CC/BCC email addresses
+
 	
-Example test:
+Example Test
+-------------------------------------------------------------------------------
 
 ```c#
+// You would normally do this for the entire test fixture
+var server = SimpleSmtpServer.Start();
+			
 SmtpMail.SmtpServer = "localhost";
 SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
 
@@ -39,4 +44,6 @@ Assert.AreEqual("text/plain", email.Headers.ContentType.MediaType);
 
 Assert.AreEqual("This is the subject", email.Headers.Subject);
 Assert.AreEqual("This is the body.", email.FindFirstPlainTextVersion().GetBodyAsText());
+
+server.Stop();
 ```
