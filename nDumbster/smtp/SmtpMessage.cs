@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Net.Mime;
 using System.Text;
+using System.Text.RegularExpressions;
 
 #endregion
 #region copyright
@@ -42,6 +44,14 @@ namespace nDumbster.smtp
 			}
 		}
 
+        virtual public string RawMessage
+        {
+            get
+            {
+                return rawMessageBuilder.ToString();
+            }
+        }
+
 		/// <summary>
 		/// Number of lines in message body.
 		/// </summary>
@@ -61,7 +71,8 @@ namespace nDumbster.smtp
 		/// <summary>
 		/// Message body.
 		/// </summary>
-		private StringBuilder body;
+        private StringBuilder body;
+        private StringBuilder rawMessageBuilder = new StringBuilder();
 
 		/// <summary>
 		/// Number of lines in body
@@ -88,6 +99,11 @@ namespace nDumbster.smtp
 			bodyLineCount = 0;
 		}
 
+	    private bool IsMultiPartMessage
+	    {
+	        get { return headers["Content-Type"].IndexOf("multipart", StringComparison.InvariantCultureIgnoreCase) != -1; }
+	    }
+
 		/// <summary> 
 		/// Update the headers or body depending on the SmtpResponse object and line of input.
 		/// </summary>
@@ -95,30 +111,40 @@ namespace nDumbster.smtp
 		/// <param name="commandData">remainder of input line after SMTP command has been removed</param>
 		internal void Store(SmtpResponse response, string commandData)
 		{
-			if (commandData != null)
-			{
-				if (SmtpState.DATA_HDR == response.NextState)
-				{
-					int headerNameEnd = commandData.IndexOf(":");
-					if (headerNameEnd >= 0)
-					{
-						string name = commandData.Substring(0, (headerNameEnd) - (0)).Trim();
-						string value_Renamed = commandData.Substring(headerNameEnd + 1).Trim();
-						// We use the Add method instead of [] because we can have multiple values for a name
-						headers.Add(name, value_Renamed);
-					}
-				}
-				else if (SmtpState.DATA_BODY == response.NextState)
-				{
-					if (bodyLineCount > 0)
-						body.Append(CR);
-					body.Append(commandData);
-					bodyLineCount++;
-				}
-			}
+		    if (commandData == null) return;
+
+		    if (SmtpState.DATA_HDR == response.NextState)
+		    {
+                rawMessageBuilder.AppendLine(commandData);
+
+		        int headerNameEnd = commandData.IndexOf(":", System.StringComparison.Ordinal);
+		        if (headerNameEnd >= 0)
+		        {
+		            string name = commandData.Substring(0, (headerNameEnd) - (0)).Trim();
+		            string value_Renamed = commandData.Substring(headerNameEnd + 1).Trim();
+		            // We use the Add method instead of [] because we can have multiple values for a name
+		            headers.Add(name, value_Renamed);
+		        }
+		    }
+		    else if (SmtpState.DATA_BODY == response.NextState)
+            {
+                // The end of the headers is signified by a newline
+                if (body.Length == 0) rawMessageBuilder.Append(Environment.NewLine);
+                if (bodyLineCount > 0) rawMessageBuilder.Append(CR);
+                rawMessageBuilder.Append(commandData);
+
+		        if (bodyLineCount > 0) body.Append(CR);
+		        body.Append(commandData);
+		        bodyLineCount++;
+
+                //if (!IsMultiPartMessage) return;
+
+                //Match boundaryMatch = Regex.Match(body.ToString(), @"boundary=""?(?<boundary>[^"";\r\n]+)""?;?", RegexOptions.IgnoreCase);
+                //_BaseBoundary = boundaryMatch.Groups["boundary"].Value;
+		    }
 		}
 
-		/// <summary>
+	    /// <summary>
 		/// Headers of the message.
 		/// </summary>
 		public NameValueCollection Headers
@@ -143,6 +169,7 @@ namespace nDumbster.smtp
 					msg.Append(String.Format("{0}: {1}\n",name,val));					
 				}
 			}
+
 			msg.Append('\n');
 			msg.Append(body);
 			msg.Append('\n');

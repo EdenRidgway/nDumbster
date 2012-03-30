@@ -397,7 +397,7 @@
             Main loop of the SMTP server.
             </summary>
         </member>
-        <member name="M:nDumbster.smtp.SimpleSmtpServer.HandleSmtpTransaction(System.IO.StreamWriter,System.IO.TextReader,System.Collections.Concurrent.ConcurrentQueue{nDumbster.smtp.SmtpMessage})">
+        <member name="M:nDumbster.smtp.SimpleSmtpServer.HandleSmtpTransaction(System.IO.StreamWriter,System.IO.TextReader)">
             <summary>
             Handle an SMTP transaction, i.e. all activity between initial connect and QUIT command.
             </summary>

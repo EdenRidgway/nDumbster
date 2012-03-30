@@ -132,6 +132,12 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenPop\OpenPop.csproj">
+      <Project>{75B3E0DF-61C3-4643-AB47-DBE1CFE3D303}</Project>
+      <Name>OpenPop</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent />

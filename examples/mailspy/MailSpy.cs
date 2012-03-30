@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using OpenPop.Mime;
 using nDumbster.smtp;
 
 namespace mailspy
@@ -20,7 +21,7 @@ namespace mailspy
 			{
 				if (server.ReceivedEmailCount > 0)
 				{
-					foreach(SmtpMessage message in server.ReceivedEmail)
+					foreach(Message message in server.ReceivedEmail)
 					{
 						Console.WriteLine("----------------------------------------------------------------");
 						Console.WriteLine();

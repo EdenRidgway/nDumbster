@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
+using OpenPop.Mime;
 
 #endregion
 #region copyright
@@ -91,7 +93,7 @@ namespace nDumbster.smtp
 		/// <summary>
 		/// Stores all of the email received since this instance started up.
 		/// </summary>
-        private ConcurrentQueue<SmtpMessage> receivedMail = new ConcurrentQueue<SmtpMessage>();
+        private ConcurrentQueue<Message> receivedMail = new ConcurrentQueue<Message>();
 		
 		/// <summary>
 		/// Indicates whether this server is stopped or not.
@@ -158,7 +160,7 @@ namespace nDumbster.smtp
 		/// List of email received by this instance since start up.
 		/// </summary>
 		/// <value><see cref="Array">Array</see> holding received <see cref="SmtpMessage">SmtpMessage</see></value>
-		virtual public IEnumerable<SmtpMessage> ReceivedEmail
+        virtual public IEnumerable<Message> ReceivedEmail
 		{
 			get
 			{
@@ -171,7 +173,7 @@ namespace nDumbster.smtp
 		/// </summary>
 		virtual public void ClearReceivedEmail()
 		{
-            receivedMail = new ConcurrentQueue<SmtpMessage>();
+            receivedMail = new ConcurrentQueue<Message>();
 		}
 
 		/// <summary>
@@ -241,7 +243,7 @@ namespace nDumbster.smtp
 					StreamWriter output = new StreamWriter(networkStream);
 
 					// Fetch all incomming messages from client, and add them to the queue
-                    HandleSmtpTransaction(output, input, receivedMail);
+                    HandleSmtpTransaction(output, input);
 					
 					// Close client connection, and wait for another one
 					socket.Close();
@@ -273,7 +275,7 @@ namespace nDumbster.smtp
 	    /// <param name="input">input stream</param>
 	    /// <param name="messageQueue">The message queue to add any messages to</param>
 	    /// <returns>List of received SmtpMessages</returns>
-	    private void HandleSmtpTransaction(StreamWriter output, TextReader input, ConcurrentQueue<SmtpMessage> messageQueue)
+        private void HandleSmtpTransaction(StreamWriter output, TextReader input)
 		{
 			// Initialize the state machine
 			SmtpState smtpState = SmtpState.CONNECT;
@@ -303,18 +305,25 @@ namespace nDumbster.smtp
 				SmtpResponse response = request.Execute();
 				// Move to next internal state
 				smtpState = response.NextState;
-				// Send reponse to client
-				SendResponse(output, response);
-
 				// Store input in message
 				msg.Store(response, request.Params);
 
 				// If message reception is complete save it
 				if (smtpState == SmtpState.QUIT)
 				{
-                    messageQueue.Enqueue(msg);
+                    string mimeMessage = msg.RawMessage;
+                    byte[] messageBytes = Encoding.ASCII.GetBytes(mimeMessage);
+                    Message message = new Message(messageBytes, true);
+
+                    receivedMail.Enqueue(message);
+
 					msg = new SmtpMessage();
-				}
+                }
+
+                // Send reponse to client after we have stored the email, so when asking for the recived mail list it will be there 
+                // (this was not the way it was done before)
+                SendResponse(output, response);
+
 			}
 		}
 

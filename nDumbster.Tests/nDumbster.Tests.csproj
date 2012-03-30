@@ -119,6 +119,10 @@
       <Project>{C212524F-7E3A-4B15-9038-5B5A661FE913}</Project>
       <Name>nDumbster</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenPop\OpenPop.csproj">
+      <Project>{75B3E0DF-61C3-4643-AB47-DBE1CFE3D303}</Project>
+      <Name>OpenPop</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
