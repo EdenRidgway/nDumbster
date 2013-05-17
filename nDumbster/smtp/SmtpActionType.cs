@@ -17,7 +17,7 @@
  */
 #endregion // copyright
 
-namespace nDumbster.smtp
+namespace nDumbster.Smtp
 {
 	/// <summary> Represents an SMTP action or command.</summary>
 	internal class SmtpActionType
@@ -26,7 +26,7 @@ namespace nDumbster.smtp
 		/// <summary>
 		/// Internal value for the action type.
 		/// </summary>
-		private sbyte action;
+		private readonly sbyte _action;
 
 		/// <summary>
 		/// Internal representation of the CONNECT action.
@@ -151,7 +151,7 @@ namespace nDumbster.smtp
 		/// <param name="action">one of the _BYTE values</param>
 		private SmtpActionType(sbyte action)
 		{
-			this.action = action;
+			this._action = action;
 		}
 		#endregion // Constructors
 
@@ -163,7 +163,7 @@ namespace nDumbster.smtp
 		{
 			get
 			{
-				return action < 0;
+				return _action < 0;
 			}
 
 		}
@@ -176,7 +176,7 @@ namespace nDumbster.smtp
 		/// 
 		public override string ToString()
 		{
-			switch (action)
+			switch (_action)
 			{
 
 				case CONNECT_BYTE:

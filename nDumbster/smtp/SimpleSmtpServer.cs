@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Mail;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -31,7 +32,7 @@ using OpenPop.Mime;
  */
 #endregion // copyright
 
-namespace nDumbster.smtp
+namespace nDumbster.Smtp
 {
 	/// <summary>
 	/// Dummy SMTP server for testing purposes.
@@ -93,30 +94,27 @@ namespace nDumbster.smtp
 		/// <summary>
 		/// Stores all of the email received since this instance started up.
 		/// </summary>
-        private ConcurrentQueue<Message> receivedMail = new ConcurrentQueue<Message>();
+        private ConcurrentQueue<MailMessage> _receivedMail = new ConcurrentQueue<MailMessage>();
 		
 		/// <summary>
 		/// Indicates whether this server is stopped or not.
 		/// </summary>
-		private volatile bool stopped = true;
+		private volatile bool _stopped = true;
 
 		/// <summary>
 		/// Listen for client connection
 		/// </summary>
-		protected TcpListener tcpListener = null;
+		protected TcpListener TcpListener = null;
 
 		/// <summary>
 		/// Synchronization <see cref="AutoResetEvent">event</see> : Set when server has started (successfully or not)
 		/// </summary>
-		internal AutoResetEvent startedEvent = null;
+		internal AutoResetEvent StartedEvent = null;
 
 		/// <summary>
 		/// Last <see cref="Exception">Exception</see> that happened in main loop thread
 		/// </summary>
-		internal Exception mainThreadException = null;
-
-
-        private object _lock = new object();
+		internal Exception MainThreadException = null;
 
 		#endregion // Members
 
@@ -127,7 +125,7 @@ namespace nDumbster.smtp
 		private SimpleSmtpServer(int port)
 		{
 			this.port = port;
-			this.startedEvent = new AutoResetEvent(false);
+			this.StartedEvent = new AutoResetEvent(false);
 		}
 		#endregion // Constructors;
 
@@ -140,7 +138,7 @@ namespace nDumbster.smtp
 		{
 			get
 			{
-				return stopped;
+				return _stopped;
 			}
 		}
 		
@@ -160,11 +158,11 @@ namespace nDumbster.smtp
 		/// List of email received by this instance since start up.
 		/// </summary>
 		/// <value><see cref="Array">Array</see> holding received <see cref="SmtpMessage">SmtpMessage</see></value>
-        virtual public IEnumerable<Message> ReceivedEmail
+        virtual public IEnumerable<MailMessage> ReceivedEmail
 		{
 			get
 			{
-                return receivedMail;
+                return _receivedMail;
 			}
 		}
 
@@ -173,7 +171,7 @@ namespace nDumbster.smtp
 		/// </summary>
 		virtual public void ClearReceivedEmail()
 		{
-            receivedMail = new ConcurrentQueue<Message>();
+            _receivedMail = new ConcurrentQueue<MailMessage>();
 		}
 
 		/// <summary>
@@ -184,7 +182,7 @@ namespace nDumbster.smtp
 		{
 			get
 			{
-				return receivedMail.Count;
+				return _receivedMail.Count;
 			}
 
 		}
@@ -195,28 +193,29 @@ namespace nDumbster.smtp
 		/// </summary>
 		internal void Run()
 		{
-			stopped = false;
+			_stopped = false;
+
 			try
 			{
 				try
 				{
 					// Open a listener to accept client connection
-					tcpListener = new TcpListener(IPAddress.Any, Port);
-					tcpListener.Start();
+					TcpListener = new TcpListener(IPAddress.Any, Port);
+					TcpListener.Start();
 				}
 				catch(Exception e)
 				{
 					// If we can't start the listener, we don't start loop
-					stopped = true;
+					_stopped = true;
 					// And store exception that will be thrown back to the thread
 					// that started the server
-					mainThreadException = e;
+					MainThreadException = e;
 				}
 				finally
 				{
 					// Inform calling thread that we can noew receive messages
 					// or that something bad happened.
-					startedEvent.Set();
+					StartedEvent.Set();
 				}
 
 				// Server: loop until stopped
@@ -226,7 +225,7 @@ namespace nDumbster.smtp
 					try
 					{
 						// Accept an incomming client connection
-						socket = tcpListener.AcceptSocket();
+						socket = TcpListener.AcceptSocket();
 					}
 					catch
 					{
@@ -252,18 +251,18 @@ namespace nDumbster.smtp
 			catch (Exception e)
 			{
 				// Send exception back to calling thread
-				mainThreadException = e;
+				MainThreadException = e;
 			}
 			finally
 			{
 				// The server won't listen anymore
-				stopped = true;
+				_stopped = true;
 
 				// Stop the listener if it was started
-				if (tcpListener != null)
+				if (TcpListener != null)
 				{
-					tcpListener.Stop();
-					tcpListener = null;
+					TcpListener.Stop();
+					TcpListener = null;
 				}
 			}
 		}
@@ -289,7 +288,7 @@ namespace nDumbster.smtp
 			smtpState = smtpResponse.NextState;
 
 			SmtpMessage msg = new SmtpMessage();
-
+            
 			while (smtpState != SmtpState.CONNECT)
 			{
 				string line = input.ReadLine();
@@ -311,11 +310,12 @@ namespace nDumbster.smtp
 				// If message reception is complete save it
 				if (smtpState == SmtpState.QUIT)
 				{
+                    // Remove the last carriage return and new line
                     string mimeMessage = msg.RawMessage;
                     byte[] messageBytes = Encoding.ASCII.GetBytes(mimeMessage);
                     Message message = new Message(messageBytes, true);
 
-                    receivedMail.Enqueue(message);
+                    _receivedMail.Enqueue(message.ToMailMessage());
 
 					msg = new SmtpMessage();
                 }
@@ -334,11 +334,10 @@ namespace nDumbster.smtp
 		/// <param name="smtpResponse">Response to send</param>
 		private void SendResponse(StreamWriter output, SmtpResponse smtpResponse)
 		{
-			if (smtpResponse.Code > 0)
-			{
-				output.WriteLine(smtpResponse.Code + " " + smtpResponse.Message);
-				output.Flush();
-			}
+		    if (smtpResponse.Code <= 0) return;
+
+		    output.WriteLine(smtpResponse.Code + " " + smtpResponse.Message);
+		    output.Flush();
 		}
 
 		/// <summary>
@@ -346,10 +345,13 @@ namespace nDumbster.smtp
 		/// </summary>
 		public virtual void Stop()
 		{
-			stopped = true;
-			try 
+			_stopped = true;
+
+			try
 			{
-				tcpListener.Stop();
+			    ClearReceivedEmail();
+				if (TcpListener != null) TcpListener.Stop();
+                //if (Thread.CurrentThread.IsAlive) Thread.CurrentThread.Abort();
 			} 
 			catch
 			{
@@ -380,11 +382,11 @@ namespace nDumbster.smtp
 
 			Thread smtpServerThread = new Thread(server.Run);
 			smtpServerThread.Start();
-
+            
 			// Block until the server socket is created
 			try 
 			{
-				server.startedEvent.WaitOne();
+				server.StartedEvent.WaitOne();
 			} 
 			catch 
 			{
@@ -392,8 +394,8 @@ namespace nDumbster.smtp
 			}
 
 			// If an exception occured during server startup, send it back.
-			if (server.mainThreadException != null)
-				throw server.mainThreadException;
+			if (server.MainThreadException != null)
+				throw server.MainThreadException;
 
 			return server;
 		}

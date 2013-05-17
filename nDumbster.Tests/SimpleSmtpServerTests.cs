@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
 using OpenPop.Mime;
-using nDumbster.smtp;
+using nDumbster.Smtp;
 using System.Web.Mail;
-using MailMessage = System.Web.Mail.MailMessage;
+using MailMessage = System.Net.Mail.MailMessage;
 
 namespace nDumbster.Tests
 {
@@ -18,8 +18,10 @@ namespace nDumbster.Tests
 	[TestFixture]
 	public class SimpleSmtpServerTests
 	{
-		SimpleSmtpServer server;
-		SimpleSmtpServer server2;
+		private SimpleSmtpServer server;
+        private SimpleSmtpServer server2;
+
+        private int ALT_PORT = 2525;
 
 		public SimpleSmtpServerTests()
 		{
@@ -54,20 +56,15 @@ namespace nDumbster.Tests
             SmtpMail.SmtpServer = "localhost";
             SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
 
-            //Thread.Sleep(1000);
-
             Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-            Assert.AreEqual(1, server.ReceivedEmailCount, "server.ReceivedEmailSize");
 
             var email = server.ReceivedEmail.First();
 
-            Assert.AreEqual("everybody@bar.com", email.Headers.To.First().Address);
-            Assert.AreEqual("somebody@foo.com", email.Headers.From.Address);
+            Assert.AreEqual("everybody@bar.com", email.To.First().Address);
+            Assert.AreEqual("somebody@foo.com", email.From.Address);
 
-            Assert.AreEqual("text/plain", email.Headers.ContentType.MediaType);
-
-            Assert.AreEqual("This is the subject", email.Headers.Subject);
-            Assert.AreEqual("This is the body.", email.FindFirstPlainTextVersion().GetBodyAsText());
+            Assert.AreEqual("This is the subject", email.Subject);
+            Assert.AreEqual("This is the body.", email.Body);
         }
 
 		[Test]
@@ -75,18 +72,18 @@ namespace nDumbster.Tests
         {
             using (var smtp = new SmtpClient { Host = "localhost" })
             {
-                var msg = new System.Net.Mail.MailMessage { Body = "This is the body", Subject = "This is the subject", From = new MailAddress("somebody@foo.com") };
+                var msg = new MailMessage { Body = "This is the body", Subject = "This is the subject", From = new MailAddress("somebody@foo.com") };
                 msg.To.Add(new MailAddress("everybody@bar.com"));
 
-                Stream attachementStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("nDumbster.Tests.rfc2821.txt");
+                Stream attachmentStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("nDumbster.Tests.rfc2821.txt");
                 string attachmentText;
-                using (var attachmentReader = new StreamReader(attachementStream))
+                using (var attachmentReader = new StreamReader(attachmentStream))
                 {
                     attachmentText = attachmentReader.ReadToEnd();
                 }
 
-                attachementStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("nDumbster.Tests.rfc2821.txt");
-                msg.Attachments.Add(new Attachment(attachementStream, "rfc2821.txt"));
+                attachmentStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("nDumbster.Tests.rfc2821.txt");
+                msg.Attachments.Add(new Attachment(attachmentStream, "rfc2821.txt"));
 
                 smtp.Send(msg);
                 Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
@@ -94,131 +91,54 @@ namespace nDumbster.Tests
 
                 var email = server.ReceivedEmail.First();
 
-                Assert.AreEqual("everybody@bar.com", email.Headers.To.First().Address);
-                Assert.AreEqual("somebody@foo.com", email.Headers.From.Address);
+                Assert.AreEqual("everybody@bar.com", email.To.First().Address);
+                Assert.AreEqual("somebody@foo.com", email.From.Address);
 
-                Assert.AreEqual("This is the subject", email.Headers.Subject);
-                Assert.AreEqual("This is the body", email.FindFirstPlainTextVersion().GetBodyAsText());
+                Assert.AreEqual("This is the subject", email.Subject);
+                Assert.AreEqual("This is the body", email.Body);
 
-                var attachments = email.FindAllAttachments();
+                var attachments = email.Attachments;
                 Assert.That(attachments.Count, Is.EqualTo(1));
-                var attachment = attachments[0].GetBodyAsText();
-                Assert.That(attachmentText, Is.EqualTo(attachment));
+
+                using (var reader = new StreamReader(attachments[0].ContentStream))
+                {
+                    Assert.That(attachmentText, Is.EqualTo(reader.ReadToEnd()));
+                }
             }
-		}
-
-		[Test]
-		public void SendMessagesWithCarriageReturn() 
-		{
-			String bodyWithCR = "\n\nKeep these pesky carriage returns\n\nPlease,\nPlease\n\n";
-
-			System.Web.Mail.SmtpMail.SmtpServer = "localhost";
-			SmtpMessage.CR = "\n";
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "CRTest", bodyWithCR);
-
-			Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(1, server.ReceivedEmailCount, "server.ReceivedEmailSize");
-
-			var email =  server.ReceivedEmail.First();
-
-			Assert.AreEqual("everybody@bar.com", email.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email.Headers.From.Address);
-			
-			Assert.AreEqual("CRTest", email.Headers.Subject);
-			Assert.AreEqual("text/plain", email.Headers.ContentType.MediaType);
-
-			Assert.AreEqual(bodyWithCR, email.FindFirstPlainTextVersion().GetBodyAsText(),  "Body with CR");
-
-			server.ClearReceivedEmail();
-
-			String bodyWithCRLF = "\r\n\r\nKeep these pesky carriage returns\r\n\r\nPlease,\r\nPlease\r\n\r\n";
-
-			SmtpMessage.CR = "\r\n";
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "CRTest", bodyWithCRLF);
-
-			Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(1, server.ReceivedEmailCount, "server.ReceivedEmailSize");
-
-			email = server.ReceivedEmail.First();
-
-			Assert.AreEqual("everybody@bar.com", email.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email.Headers.From.Address);
-			
-			Assert.AreEqual("CRTest", email.Headers.Subject);
-			Assert.AreEqual("text/plain", email.Headers.ContentType.MediaType);
-
-			Assert.AreEqual(bodyWithCRLF, email.FindFirstPlainTextVersion().GetBodyAsText(), "Body with CRLF");
-
 		}
 
 		[Test]
 		public void SendTwoMessages()
 		{
-			System.Web.Mail.SmtpMail.SmtpServer = "localhost";
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "nobody@bar.com", "This is the second subject", "This is the second body.");
+		    using (var smtp = new SmtpClient {Host = "localhost"})
+		    {
+                var msg = new MailMessage { Body = "This is the body.", Subject = "This is the subject", From = new MailAddress("somebody@foo.com") };
+                msg.To.Add(new MailAddress("everybody@bar.com"));
+                smtp.Send(msg);
 
-            Assert.AreEqual(2, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(2, server.ReceivedEmailCount, "server.ReceivedEmailSize");
-			
-			var email1 =  server.ReceivedEmail.First();
-			
-			Assert.AreEqual("everybody@bar.com", email1.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email1.Headers.From.Address);
-			
-			Assert.AreEqual("text/plain", email1.Headers.ContentType.MediaType);
+                msg = new MailMessage { Body = "This is the second body.", Subject = "This is the second subject", From = new MailAddress("nobody@test.com") };
+                msg.To.Add(new MailAddress("test2@test.com"));
+                smtp.Send(msg);
 
-			Assert.AreEqual("This is the subject", email1.Headers.Subject);
-			Assert.AreEqual("This is the body.", email1.FindFirstPlainTextVersion().GetBodyAsText());
+		        Assert.AreEqual(2, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
+		        Assert.AreEqual(2, server.ReceivedEmailCount, "server.ReceivedEmailSize");
 
-			var email2 =  server.ReceivedEmail.Skip(1).First();
-			
-			Assert.AreEqual("nobody@bar.com", email2.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email2.Headers.From.Address);
-			
-			Assert.AreEqual("text/plain", email2.Headers.ContentType.MediaType);
+		        var email1 = server.ReceivedEmail.First();
 
-			Assert.AreEqual("This is the second subject", email2.Headers.Subject);
-			Assert.AreEqual("This is the second body.", email2.FindFirstPlainTextVersion().GetBodyAsText());
-		}
+                Assert.AreEqual("somebody@foo.com", email1.From.Address);
+                Assert.AreEqual("everybody@bar.com", email1.To.First().Address);
 
-		[Test]
-		public void StopStartServer()
-		{
-			System.Web.Mail.SmtpMail.SmtpServer = "localhost";
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
+		        Assert.AreEqual("This is the subject", email1.Subject);
+                Assert.AreEqual("This is the body.", email1.Body);
 
-            Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(1, server.ReceivedEmailCount, "server.ReceivedEmailSize");
-			
-			var email1 =  server.ReceivedEmail.First();
-			
-			Assert.AreEqual("everybody@bar.com", email1.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email1.Headers.From.Address);
-			
-			Assert.AreEqual("text/plain", email1.Headers.ContentType.MediaType);
+		        var email2 = server.ReceivedEmail.Skip(1).First();
 
-			Assert.AreEqual("This is the subject", email1.Headers.Subject);
-			Assert.AreEqual("This is the body.", email1.FindFirstPlainTextVersion().GetBodyAsText());
+                Assert.AreEqual("test2@test.com", email2.To.First().Address);
+                Assert.AreEqual("nobody@test.com", email2.From.Address);
 
-
-			server.Stop();
-			server = SimpleSmtpServer.Start();
-
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "nobody@bar.com", "This is the second subject", "This is the second body.");
-
-            Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(1, server.ReceivedEmailCount, "server.ReceivedEmailSize");
-
-			var email2 =  server.ReceivedEmail.First();
-			
-			Assert.AreEqual("nobody@bar.com", email2.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email2.Headers.From.Address);
-			
-			Assert.AreEqual("text/plain", email2.Headers.ContentType.MediaType);
-
-			Assert.AreEqual("This is the second subject", email2.Headers.Subject);
-			Assert.AreEqual("This is the second body.", email2.FindFirstPlainTextVersion().GetBodyAsText());
+		        Assert.AreEqual("This is the second subject", email2.Subject);
+		        Assert.AreEqual("This is the second body.", email2.Body);
+		    }
 		}
 
 		[Test]
@@ -226,62 +146,17 @@ namespace nDumbster.Tests
 		public void ServerBindingError()
 		{
 			// Server is already running. We check that this cause an SocketException to be thrown
-			SimpleSmtpServer server2 = SimpleSmtpServer.Start();
+            var server2 = SimpleSmtpServer.Start();
 
 			Assert.Fail("BindingError");
 		}
 
-		[Test]
-		public void MultipleServerPort()
-		{
-			int ALT_PORT = 2525;
-
-			// Start second server
-			server2 = SimpleSmtpServer.Start(ALT_PORT);
-
-			// Send to first server
-			System.Web.Mail.SmtpMail.SmtpServer = "localhost";
-			System.Web.Mail.SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
-
-
-			// Send to second server
-			var mail = new MailMessage(); 
-			mail.To = "nobody@bar.com"; 
-			mail.From = "somebody@foo.com"; 
-			mail.Subject = "This is the second subject"; 
-			mail.Body = "This is the second body."; 
-			mail.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpserverport", ALT_PORT.ToString()); 
-			SmtpMail.Send(mail);
-
-			// Check first server
-            Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(1, server.ReceivedEmailCount, "server.ReceivedEmailSize");
-			
-			var email =  server.ReceivedEmail.First();
-			
-			Assert.AreEqual("everybody@bar.com", email.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email.Headers.From.Address);
-
-            Assert.AreEqual("text/plain", email.Headers.ContentType.MediaType);
-
-			Assert.AreEqual("This is the subject", email.Headers.Subject);
-			Assert.AreEqual("This is the body.", email.FindFirstPlainTextVersion().GetBodyAsText());
-
-			// Check second server
-            Assert.AreEqual(1, server2.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
-			Assert.AreEqual(1, server2.ReceivedEmailCount, "server.ReceivedEmailSize");
-
-			var email1 =  server2.ReceivedEmail.First();
-			
-			Assert.AreEqual("nobody@bar.com", email1.Headers.To.First().Address);
-			Assert.AreEqual("somebody@foo.com", email1.Headers.From.Address);
-			
-			Assert.AreEqual("text/plain", email1.Headers.ContentType.MediaType);
-
-			Assert.AreEqual("This is the second subject", email1.Headers.Subject);
-			Assert.AreEqual("This is the second body.", email1.FindFirstPlainTextVersion().GetBodyAsText());
-
-		}
+        [Test]
+        public void ServerCanRunOnDifferentPort()
+        {
+            // Server is already running. We check that this cause an SocketException to be thrown
+            var server2 = SimpleSmtpServer.Start(ALT_PORT);
+        }
 	}
 }
 

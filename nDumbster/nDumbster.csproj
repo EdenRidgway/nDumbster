@@ -96,22 +96,22 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="smtp\SimpleSmtpServer.cs">
+    <Compile Include="Smtp\SimpleSmtpServer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="smtp\SmtpActionType.cs">
+    <Compile Include="Smtp\SmtpActionType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="smtp\SmtpMessage.cs">
+    <Compile Include="Smtp\SmtpMessage.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="smtp\SmtpRequest.cs">
+    <Compile Include="Smtp\SmtpRequest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="smtp\SmtpResponse.cs">
+    <Compile Include="Smtp\SmtpResponse.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="smtp\SmtpState.cs">
+    <Compile Include="Smtp\SmtpState.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

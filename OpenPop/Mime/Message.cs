@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Mail;
 using System.Text;
+using System.Text.RegularExpressions;
 using OpenPop.Mime.Header;
 using OpenPop.Mime.Traverse;
 
@@ -29,6 +30,14 @@ namespace OpenPop.Mime
 	/// </example>
 	public class Message
 	{
+        private static Regex _trimEndRegex = new Regex(
+          "\\r\\n$",
+        RegexOptions.CultureInvariant
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+
+
 		#region Public properties
 		/// <summary>
 		/// Headers of the Message.
@@ -175,7 +184,7 @@ namespace OpenPop.Mime
 				MemoryStream stream = new MemoryStream(attachmentMessagePart.Body);
 				Attachment attachment = new Attachment(stream, attachmentMessagePart.ContentType);
 				attachment.ContentId = attachmentMessagePart.ContentId;
-				message.Attachments.Add(attachment);
+			    message.Attachments.Add(attachment);
 			}
 
 			if(Headers.From != null && Headers.From.HasValidMailAddress)
@@ -204,6 +213,8 @@ namespace OpenPop.Mime
 				if (bcc.HasValidMailAddress)
 					message.Bcc.Add(bcc.MailAddress);
 			}
+
+		    message.Body = _trimEndRegex.Replace(message.Body, "");
 
 			return message;
 		}

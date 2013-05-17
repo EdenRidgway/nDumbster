@@ -1,6 +1,6 @@
 Introduction
 ===============================================================================
-This is a fork of nDumbster, the fake SMTP server, that was originally hosted at: http://ndumbster.sourceforge.net/default.html. nDumbster is useful in automated tests where instead of having to create a wrapper around the mail sending then providing a mock
+This is a fork of nDumbster, the Test SMTP server, that was originally hosted at: http://ndumbster.sourceforge.net/default.html. nDumbster is useful in automated tests where instead of having to create a wrapper around the mail sending then providing a mock
 implementation you actually test the email sending component. The SMTP server keeps the messages in memory so you can query what has been sent.
 
 This version is a signficant improvement over the old version as it now uses OpenPop to parse the mail messages sent to the server. This allows 

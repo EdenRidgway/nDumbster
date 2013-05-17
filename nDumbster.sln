@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nDumbster", "nDumbster\nDum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nDumbster.Tests", "nDumbster.Tests\nDumbster.Tests.csproj", "{7E1D781E-00A9-441D-9203-2BDD45E6A963}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mailspy", "examples\mailspy\mailspy.csproj", "{96F452D0-E817-4307-ACA7-4DB04B7314CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailspy", "examples\mailspy\Mailspy.csproj", "{96F452D0-E817-4307-ACA7-4DB04B7314CD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AA883920-9119-4A8C-82EA-B81B614557A1}"
 	ProjectSection(SolutionItems) = preProject

@@ -15,14 +15,14 @@ namespace nDumbster.Tests
 		[TestFixtureSetUp]
 		public void CollectTypeInfo()
 		{
-			smtpAction = new PrivateObjectTester("nDumbster.smtp.SmtpActionType,nDumbster", (sbyte)0);
-			smtpState = new PrivateObjectTester("nDumbster.smtp.SmtpState,nDumbster", (sbyte)0);
+			smtpAction = new PrivateObjectTester("nDumbster.Smtp.SmtpActionType,nDumbster", (sbyte)0);
+			smtpState = new PrivateObjectTester("nDumbster.Smtp.SmtpState,nDumbster", (sbyte)0);
 		}
 
 		[Test]
 		public void UnrecognizedCommandConnectState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("CONNECT"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("CONNECT"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(500,  response.GetProperty("Code"));
 		}
@@ -30,7 +30,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void UnrecognizedCommandGreetState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("GREET"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("GREET"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(500,  response.GetProperty("Code"));
 		}
@@ -38,7 +38,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void UnrecognizedCommandMailState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("MAIL"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("MAIL"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(500,  response.GetProperty("Code"));
 		}
@@ -46,7 +46,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void UnrecognizedCommandQuitState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("QUIT"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("QUIT"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(500,  response.GetProperty("Code"));
 		}
@@ -54,7 +54,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void UnrecognizedCommandRcptState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("RCPT"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("RCPT"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(500,  response.GetProperty("Code"));
 		}
@@ -62,7 +62,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void UnrecognizedCommandDataBodyState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("DATA_BODY"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("DATA_BODY"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(-1,  response.GetProperty("Code"));
 		}
@@ -70,7 +70,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void UnrecognizedCommandDataHdrState() 
 		{
-			PrivateObjectTester request = new PrivateObjectTester("nDumbster.smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("DATA_HDR"));
+			PrivateObjectTester request = new PrivateObjectTester("nDumbster.Smtp.SmtpRequest,nDumbster",smtpAction.GetField("UNRECOG"), "", smtpState.GetField("DATA_HDR"));
 			PrivateObjectTester response = new PrivateObjectTester(request.Invoke("Execute"));
 			Assert.AreEqual(-1,  response.GetProperty("Code"));
 		}

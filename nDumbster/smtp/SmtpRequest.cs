@@ -17,7 +17,7 @@
  */
 #endregion // copyright
 
-namespace nDumbster.smtp
+namespace nDumbster.Smtp
 {
 	/// <summary>
 	/// Contains an SMTP client request and handles state transitions.
