@@ -14,7 +14,7 @@ Apart from being upgraded to .Net 4.0 the following improvements have been made 
 2. Fixed the race condition issue in the code (sending back an SMTP finished before saving the message) 
    that meant that Assertions made after an SMTP send could fail from time to time.
 3. Generics have been used instead of ArrayLists
-4. Messags are now returned as OpenPop messages which allow you to query the various messages 
+4. Messags are now returned as System.Net.Mail.Messages which allow you to query the various messages 
    parts far more easily, such as:
 	* Headers are strongly typed
 	* Text versus HTML versions can be extracted and compared
