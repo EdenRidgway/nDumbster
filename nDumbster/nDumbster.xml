@@ -161,184 +161,6 @@
             </summary>
             <value>Number of messages</value>
         </member>
-        <member name="T:nDumbster.Smtp.SmtpMessage">
-            <summary>
-            Container for a complete SMTP message - headers and message body.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpMessage.DEFAULT_CRLF">
-            <summary>
-            Default carriage return code is CRLF.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpMessage.headers">
-            <summary>
-            Headers: Collection of named values.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpMessage._body">
-            <summary>
-            Message body.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpMessage._bodyLineCount">
-            <summary>
-            Number of lines in body
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpMessage.CR">
-            <summary>
-            Code used for carriage return in the body.
-            </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpMessage.#ctor">
-            <summary>
-            Constructor. Initializes headers collection and body buffer.
-            </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpMessage.Store(nDumbster.Smtp.SmtpResponse,System.String)">
-            <summary> 
-            Update the headers or body depending on the SmtpResponse object and line of input.
-            </summary>
-            <param name="response">SmtpResponse object</param>
-            <param name="commandData">remainder of input line after SMTP command has been removed</param>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpMessage.ToString">
-            <summary>
-            String representation of the SmtpMessage.
-            </summary>
-            <returns>A String that displays the current SmtpMessage headers and body</returns>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpMessage.Body">
-            <summary>
-            Message body.
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpMessage.RawMessage">
-            <summary>
-            The raw SMTP message
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpMessage.BodyLineCount">
-            <summary>
-            Number of lines in message body.
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpMessage.IsMultiPartMessage">
-            <summary>
-            Determines whether or not this is a multi-part message
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpMessage.Headers">
-            <summary>
-            Headers of the message.
-            </summary>
-        </member>
-        <member name="T:nDumbster.Smtp.SmtpState">
-            <summary> 
-            SMTP server state.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.CONNECT_BYTE">
-            <summary>Internal representation of the CONNECT state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.GREET_BYTE">
-            <summary>Internal representation of the GREET state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.MAIL_BYTE">
-            <summary>Internal representation of the MAIL state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.RCPT_BYTE">
-            <summary>Internal representation of the RCPT state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_HEADER_BYTE">
-            <summary>Internal representation of the DATA_HEADER state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY_BYTE">
-            <summary>Internal representation of the DATA_BODY state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.QUIT_BYTE">
-            <summary>Internal representation of the QUIT state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.state">
-            <summary>Internal representation of the state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.CONNECT">
-            <summary>CONNECT state: waiting for a client connection. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.GREET">
-            <summary>GREET state: wating for a ELHO message. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.MAIL">
-            <summary>MAIL state: waiting for the MAIL FROM: command. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.RCPT">
-            <summary>RCPT state: waiting for a RCPT &lt;email address&gt; command. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_HDR">
-            <summary>Waiting for headers. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY">
-            <summary>Processing body text. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.QUIT">
-            <summary>End of client transmission. </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpState.#ctor(System.SByte)">
-            <summary>
-            Create a new SmtpState object. Private to ensure that only valid states can be created.
-            </summary>
-            <param name="state">one of the _BYTE values.</param>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpState.ToString">
-            <summary>
-            String representation of this SmtpState.
-            </summary>
-            <returns>A String that represents the current SmtpState</returns>
-        </member>
-        <member name="T:nDumbster.Smtp.SmtpResponse">
-            <summary>
-            SMTP response container.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpResponse.code">
-            <summary>
-            Response code - see RFC-2821. 
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpResponse.message">
-            <summary>
-            Response message. 
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpResponse.nextState">
-            <summary>
-            New state of the SMTP server once the request has been executed. 
-            </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpResponse.#ctor(System.Int32,System.String,nDumbster.Smtp.SmtpState)">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="code">response code</param>
-            <param name="message">response message</param>
-            <param name="next">next state of the SMTP server</param>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpResponse.Code">
-            <summary> 
-            Response code.
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpResponse.Message">
-            <summary> 
-            Response message.
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpResponse.NextState">
-            <summary>
-            Next SMTP server state.
-            </summary>
-        </member>
         <member name="T:nDumbster.Smtp.SmtpActionType">
             <summary> Represents an SMTP action or command.</summary>
         </member>
@@ -503,6 +325,79 @@
             Indicates whether the action is stateless or not.
             </summary>
         </member>
+        <member name="T:nDumbster.Smtp.SmtpMessage">
+            <summary>
+            Container for a complete SMTP message - headers and message body.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpMessage.DEFAULT_CRLF">
+            <summary>
+            Default carriage return code is CRLF.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpMessage.headers">
+            <summary>
+            Headers: Collection of named values.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpMessage._body">
+            <summary>
+            Message body.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpMessage._bodyLineCount">
+            <summary>
+            Number of lines in body
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpMessage.CR">
+            <summary>
+            Code used for carriage return in the body.
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpMessage.#ctor">
+            <summary>
+            Constructor. Initializes headers collection and body buffer.
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpMessage.Store(nDumbster.Smtp.SmtpResponse,System.String)">
+            <summary> 
+            Update the headers or body depending on the SmtpResponse object and line of input.
+            </summary>
+            <param name="response">SmtpResponse object</param>
+            <param name="commandData">remainder of input line after SMTP command has been removed</param>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpMessage.ToString">
+            <summary>
+            String representation of the SmtpMessage.
+            </summary>
+            <returns>A String that displays the current SmtpMessage headers and body</returns>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpMessage.Body">
+            <summary>
+            Message body.
+            </summary>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpMessage.RawMessage">
+            <summary>
+            The raw SMTP message
+            </summary>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpMessage.BodyLineCount">
+            <summary>
+            Number of lines in message body.
+            </summary>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpMessage.IsMultiPartMessage">
+            <summary>
+            Determines whether or not this is a multi-part message
+            </summary>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpMessage.Headers">
+            <summary>
+            Headers of the message.
+            </summary>
+        </member>
         <member name="T:nDumbster.Smtp.SmtpRequest">
             <summary>
             Contains an SMTP client request and handles state transitions.
@@ -573,6 +468,111 @@
             <summary>
             Parameters of this request (remainder of command line once the command is removed.
             </summary>
+        </member>
+        <member name="T:nDumbster.Smtp.SmtpResponse">
+            <summary>
+            SMTP response container.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpResponse.code">
+            <summary>
+            Response code - see RFC-2821. 
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpResponse.message">
+            <summary>
+            Response message. 
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpResponse.nextState">
+            <summary>
+            New state of the SMTP server once the request has been executed. 
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpResponse.#ctor(System.Int32,System.String,nDumbster.Smtp.SmtpState)">
+            <summary>
+            Constructor.
+            </summary>
+            <param name="code">response code</param>
+            <param name="message">response message</param>
+            <param name="next">next state of the SMTP server</param>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpResponse.Code">
+            <summary> 
+            Response code.
+            </summary>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpResponse.Message">
+            <summary> 
+            Response message.
+            </summary>
+        </member>
+        <member name="P:nDumbster.Smtp.SmtpResponse.NextState">
+            <summary>
+            Next SMTP server state.
+            </summary>
+        </member>
+        <member name="T:nDumbster.Smtp.SmtpState">
+            <summary> 
+            SMTP server state.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.CONNECT_BYTE">
+            <summary>Internal representation of the CONNECT state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.GREET_BYTE">
+            <summary>Internal representation of the GREET state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.MAIL_BYTE">
+            <summary>Internal representation of the MAIL state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.RCPT_BYTE">
+            <summary>Internal representation of the RCPT state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_HEADER_BYTE">
+            <summary>Internal representation of the DATA_HEADER state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY_BYTE">
+            <summary>Internal representation of the DATA_BODY state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.QUIT_BYTE">
+            <summary>Internal representation of the QUIT state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.state">
+            <summary>Internal representation of the state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.CONNECT">
+            <summary>CONNECT state: waiting for a client connection. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.GREET">
+            <summary>GREET state: wating for a ELHO message. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.MAIL">
+            <summary>MAIL state: waiting for the MAIL FROM: command. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.RCPT">
+            <summary>RCPT state: waiting for a RCPT &lt;email address&gt; command. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_HDR">
+            <summary>Waiting for headers. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY">
+            <summary>Processing body text. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.QUIT">
+            <summary>End of client transmission. </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpState.#ctor(System.SByte)">
+            <summary>
+            Create a new SmtpState object. Private to ensure that only valid states can be created.
+            </summary>
+            <param name="state">one of the _BYTE values.</param>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpState.ToString">
+            <summary>
+            String representation of this SmtpState.
+            </summary>
+            <returns>A String that represents the current SmtpState</returns>
         </member>
     </members>
 </doc>

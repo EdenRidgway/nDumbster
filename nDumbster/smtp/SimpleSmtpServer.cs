@@ -116,6 +116,8 @@ namespace nDumbster.Smtp
 		/// </summary>
 		internal Exception MainThreadException = null;
 
+	    internal event EventHandler<EventArgs> HasStopped; 
+
 		#endregion // Members
 
 		#region Contructors
@@ -250,8 +252,12 @@ namespace nDumbster.Smtp
 			}
 			catch (Exception e)
 			{
-				// Send exception back to calling thread
-				MainThreadException = e;
+			    // Send exception back to calling thread
+			    var socketException = e as SocketException;
+                if (!(socketException != null && !socketException.Message.Contains("WSACancelBlockingCall")))
+                {
+                    MainThreadException = e;
+                }
 			}
 			finally
 			{
@@ -264,6 +270,11 @@ namespace nDumbster.Smtp
 					TcpListener.Stop();
 					TcpListener = null;
 				}
+
+                if (HasStopped != null)
+                {
+                    HasStopped(this, new EventArgs());
+                }
 			}
 		}
 
@@ -347,17 +358,14 @@ namespace nDumbster.Smtp
 		{
 			_stopped = true;
 
-			try
-			{
-			    ClearReceivedEmail();
-				if (TcpListener != null) TcpListener.Stop();
-                //if (Thread.CurrentThread.IsAlive) Thread.CurrentThread.Abort();
-			} 
-			catch
-			{
-				// Ignore
-			}
-		}
+			ClearReceivedEmail();
+
+            AutoResetEvent waitForStoppResetEvent = new AutoResetEvent(false);
+			HasStopped += (sender, args) => waitForStoppResetEvent.Set();
+
+            TcpListener.Stop();
+			waitForStoppResetEvent.WaitOne(TimeSpan.FromSeconds(5));
+	    }
 
 		/// <overloads>
 		/// Creates an instance of SimpleSmtpServer and starts it.
@@ -395,7 +403,9 @@ namespace nDumbster.Smtp
 
 			// If an exception occured during server startup, send it back.
 			if (server.MainThreadException != null)
-				throw server.MainThreadException;
+            {
+                throw server.MainThreadException;
+			}
 
 			return server;
 		}

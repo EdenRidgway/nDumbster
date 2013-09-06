@@ -20,8 +20,9 @@ namespace nDumbster.Tests
 	{
 		private SimpleSmtpServer server;
         private SimpleSmtpServer server2;
-
-        private int ALT_PORT = 2525;
+        
+        private int TEST_ALT_PORT = 15525;
+        private int ALT_PORT = 22525;
 
 		public SimpleSmtpServerTests()
 		{
@@ -32,7 +33,7 @@ namespace nDumbster.Tests
 		[SetUp]
 		protected void SetUp() 
 		{
-			server = SimpleSmtpServer.Start();
+			server = SimpleSmtpServer.Start(TEST_ALT_PORT);
 			server2 = null;
 		}
 
@@ -51,26 +52,29 @@ namespace nDumbster.Tests
 		}
 
         [Test]
-        public void SendMessage()
-        {
-            SmtpMail.SmtpServer = "localhost";
-            SmtpMail.Send("somebody@foo.com", "everybody@bar.com", "This is the subject", "This is the body.");
+		public void SendMessage ()
+		{
+			using (var smtp = new SmtpClient { Host = "localhost", Port = TEST_ALT_PORT }) 
+			{
+				var msg = new MailMessage { Body = "This is the body", Subject = "This is the subject", From = new MailAddress("somebody@foo.com") };
+                msg.To.Add(new MailAddress("everybody@bar.com"));
+                smtp.Send(msg);
 
-            Assert.AreEqual(1, server.ReceivedEmail.Count(), "server.ReceivedEmail.Length");
+				Assert.AreEqual (1, server.ReceivedEmail.Count (), "server.ReceivedEmail.Length");
+				var email = server.ReceivedEmail.First ();
 
-            var email = server.ReceivedEmail.First();
+	            Assert.AreEqual("everybody@bar.com", email.To.First().Address);
+	            Assert.AreEqual("somebody@foo.com", email.From.Address);
 
-            Assert.AreEqual("everybody@bar.com", email.To.First().Address);
-            Assert.AreEqual("somebody@foo.com", email.From.Address);
-
-            Assert.AreEqual("This is the subject", email.Subject);
-            Assert.AreEqual("This is the body.", email.Body);
+	            Assert.AreEqual("This is the subject", email.Subject);
+	            Assert.AreEqual("This is the body", email.Body);
+			}
         }
 
 		[Test]
 		public void SendMessageWithAttachment()
         {
-            using (var smtp = new SmtpClient { Host = "localhost" })
+            using (var smtp = new SmtpClient { Host = "localhost", Port = TEST_ALT_PORT })
             {
                 var msg = new MailMessage { Body = "This is the body", Subject = "This is the subject", From = new MailAddress("somebody@foo.com") };
                 msg.To.Add(new MailAddress("everybody@bar.com"));
@@ -110,7 +114,7 @@ namespace nDumbster.Tests
 		[Test]
 		public void SendTwoMessages()
 		{
-		    using (var smtp = new SmtpClient {Host = "localhost"})
+		    using (var smtp = new SmtpClient { Host = "localhost", Port = TEST_ALT_PORT })
 		    {
                 var msg = new MailMessage { Body = "This is the body.", Subject = "This is the subject", From = new MailAddress("somebody@foo.com") };
                 msg.To.Add(new MailAddress("everybody@bar.com"));
@@ -145,8 +149,8 @@ namespace nDumbster.Tests
 		[ExpectedException(typeof( System.Net.Sockets.SocketException))]
 		public void ServerBindingError()
 		{
-			// Server is already running. We check that this cause an SocketException to be thrown
-            var server2 = SimpleSmtpServer.Start();
+            // Server is already running. We check that this cause an SocketException to be thrown
+            SimpleSmtpServer.Start(TEST_ALT_PORT);
 
 			Assert.Fail("BindingError");
 		}
@@ -155,7 +159,8 @@ namespace nDumbster.Tests
         public void ServerCanRunOnDifferentPort()
         {
             // Server is already running. We check that this cause an SocketException to be thrown
-            var server2 = SimpleSmtpServer.Start(ALT_PORT);
+            var alternateServer = SimpleSmtpServer.Start(ALT_PORT);
+            alternateServer.Stop();
         }
 	}
 }
