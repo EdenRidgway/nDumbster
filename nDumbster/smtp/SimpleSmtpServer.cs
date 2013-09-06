@@ -356,12 +356,12 @@ namespace nDumbster.Smtp
 		/// </summary>
 		public virtual void Stop()
 		{
-			_stopped = true;
-
 			ClearReceivedEmail();
 
             AutoResetEvent waitForStoppResetEvent = new AutoResetEvent(false);
 			HasStopped += (sender, args) => waitForStoppResetEvent.Set();
+
+            _stopped = true;
 
             TcpListener.Stop();
 			waitForStoppResetEvent.WaitOne(TimeSpan.FromSeconds(5));
