@@ -109,10 +109,10 @@ namespace nDumbster.MsTests
 
                 int waitLoopCount = 0;
 
-                while (SmtpSetup.SmtpServer.ReceivedEmailCount == 0 && waitLoopCount < 100)
+                while (SmtpSetup.SmtpServer.ReceivedEmailCount == 0 && waitLoopCount < 20)
                 {
                     waitLoopCount++;
-                    Thread.Sleep(300);
+                    Thread.Sleep(100);
                 }
 
                 var email = server.ReceivedEmail.First();
