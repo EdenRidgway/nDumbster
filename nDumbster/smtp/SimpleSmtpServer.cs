@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Sockets;
@@ -164,7 +165,8 @@ namespace nDumbster.Smtp
 		{
 			get
 			{
-                return _receivedMail;
+                // This will return a snapshot of the contents of the queue
+                return _receivedMail.ToList();
 			}
 		}
 
@@ -173,7 +175,8 @@ namespace nDumbster.Smtp
 		/// </summary>
 		virtual public void ClearReceivedEmail()
 		{
-            _receivedMail = new ConcurrentQueue<MailMessage>();
+		    MailMessage mailMessage;
+            while (_receivedMail.TryDequeue(out mailMessage)) {}
 		}
 
 		/// <summary>

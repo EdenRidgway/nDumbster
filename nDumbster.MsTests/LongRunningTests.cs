@@ -51,7 +51,7 @@ namespace nDumbster.MsTests
         {
             var server = SmtpSetup.SmtpServer;
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 500; i++)
             {
                 server.ClearReceivedEmail();
 
@@ -119,7 +119,7 @@ namespace nDumbster.MsTests
 
                 Assert.AreEqual("Email: " + i, email.Body);
 
-                Thread.Sleep(TimeSpan.FromMinutes(2));
+                Thread.Sleep(TimeSpan.FromSeconds(20));
             }
         }
     }
