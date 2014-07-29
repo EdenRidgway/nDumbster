@@ -216,6 +216,11 @@ namespace OpenPop.Mime
 
 		    message.Body = _trimEndRegex.Replace(message.Body, "");
 
+		    foreach (var headerKey in Headers.UnknownHeaders.AllKeys)
+		    {
+                message.Headers.Add(headerKey, Headers.UnknownHeaders.Get(headerKey));
+		    }
+
 			return message;
 		}
 

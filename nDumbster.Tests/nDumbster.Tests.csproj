@@ -102,6 +102,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="HeaderTests.cs" />
     <Compile Include="PrivateObjectTester.cs">
       <SubType>Code</SubType>
     </Compile>
