@@ -79,7 +79,7 @@ namespace nDumbster.Smtp
 	/// <threadsafety static="true" instance="true">
 	///	<para>The server create a thread to handle message reception and all access to messages list is protected.</para>
 	/// </threadsafety>
-	public class SimpleSmtpServer
+	public class SimpleSmtpServer:IDisposable
 	{
 		#region Members
 		/// <summary>
@@ -386,12 +386,14 @@ namespace nDumbster.Smtp
 		/// Creates and starts an instance of SimpleSmtpServer that will listen on a specific port.
 		/// </summary>
 		/// <param name="port">port number the server should listen to</param>
+        /// <param name="background">Whether listener thread blocks process from shutdown</param>
 		/// <returns>The <see cref="SimpleSmtpServer">SmtpServer</see> waiting for message</returns>
-		public static SimpleSmtpServer Start(int port)
+		public static SimpleSmtpServer Start(int port,bool background = false)
 		{
 			SimpleSmtpServer server = new SimpleSmtpServer(port);
 
 			Thread smtpServerThread = new Thread(server.Run);
+            smtpServerThread.IsBackground = background;
 			smtpServerThread.Start();
             
 			// Block until the server socket is created
@@ -413,5 +415,10 @@ namespace nDumbster.Smtp
 			return server;
 		}
 
-	}
+
+        public void Dispose()
+        {
+            Stop();
+        }
+    }
 }
