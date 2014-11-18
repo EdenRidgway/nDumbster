@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>nDumbster</id>
+    <version>1.0.3.0</version>
+    <title>nDumbster</title>
+    <authors>Alexis Kartmann, Martin Woodward, Eden Ridgway</authors>
+    <owners>Waleed Bekheet, Dzmitry Lahoda</owners>
+    <licenseUrl>https://raw.githubusercontent.com/EdenRidgway/nDumbster/master/license.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>nDumbster is a simple fake SMTP based on the original Dumbster java sourcecode. It has been ported  to C# to enable .Net developper to unit test applications that send email messages.
+
+nDumbster support all standard SMTP commands but instead of delivering messages to the user, it stores then in memory so they can be tested later.</description>
+    <summary>nDumbster is a simple fake SMTP based on the original Dumbster java sourcecode. It has been ported  to C# to enable .Net developper to unit test applications that send email messages.</summary>
+  </metadata>
+</package>

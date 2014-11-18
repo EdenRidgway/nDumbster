@@ -19,8 +19,13 @@ build/
 # Test results
 test-results/
 
+#Nuget
+*.nupkg
+nuget/lib/
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
+
+
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

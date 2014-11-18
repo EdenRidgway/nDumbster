@@ -9,8 +9,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AA883920-9119-4A8C-82EA-B81B614557A1}"
 	ProjectSection(SolutionItems) = preProject
 		license.txt = license.txt
-		README = README
-		version.txt = version.txt
+		nuget\nDumbster.nuspec = nuget\nDumbster.nuspec
+		readme.markdown = readme.markdown
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenPop", "OpenPop\OpenPop.csproj", "{75B3E0DF-61C3-4643-AB47-DBE1CFE3D303}"

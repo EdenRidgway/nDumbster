@@ -47,3 +47,8 @@ Assert.AreEqual("This is the body.", email.FindFirstPlainTextVersion().GetBodyAs
 
 server.Stop();
 ```
+
+How to build
+---
+
+- It is possible to build `nDumbster.sln` in SharpDevelop 4.4 installed.
