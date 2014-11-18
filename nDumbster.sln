@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nDumbster", "nDumbster\nDumbster.csproj", "{C212524F-7E3A-4B15-9038-5B5A661FE913}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nDumbster.Tests", "nDumbster.Tests\nDumbster.Tests.csproj", "{7E1D781E-00A9-441D-9203-2BDD45E6A963}"
@@ -9,8 +9,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AA883920-9119-4A8C-82EA-B81B614557A1}"
 	ProjectSection(SolutionItems) = preProject
 		license.txt = license.txt
-		README = README
-		version.txt = version.txt
+		nuget\nDumbster.nuspec = nuget\nDumbster.nuspec
+		readme.markdown = readme.markdown
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenPop", "OpenPop\OpenPop.csproj", "{75B3E0DF-61C3-4643-AB47-DBE1CFE3D303}"

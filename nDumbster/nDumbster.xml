@@ -4,138 +4,163 @@
         <name>nDumbster</name>
     </assembly>
     <members>
-        <member name="T:nDumbster.Smtp.SmtpState">
-            <summary> 
-            SMTP server state.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.CONNECT_BYTE">
-            <summary>Internal representation of the CONNECT state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.GREET_BYTE">
-            <summary>Internal representation of the GREET state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.MAIL_BYTE">
-            <summary>Internal representation of the MAIL state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.RCPT_BYTE">
-            <summary>Internal representation of the RCPT state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_HEADER_BYTE">
-            <summary>Internal representation of the DATA_HEADER state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY_BYTE">
-            <summary>Internal representation of the DATA_BODY state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.QUIT_BYTE">
-            <summary>Internal representation of the QUIT state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.state">
-            <summary>Internal representation of the state. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.CONNECT">
-            <summary>CONNECT state: waiting for a client connection. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.GREET">
-            <summary>GREET state: wating for a ELHO message. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.MAIL">
-            <summary>MAIL state: waiting for the MAIL FROM: command. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.RCPT">
-            <summary>RCPT state: waiting for a RCPT &lt;email address&gt; command. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_HDR">
-            <summary>Waiting for headers. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY">
-            <summary>Processing body text. </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpState.QUIT">
-            <summary>End of client transmission. </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpState.#ctor(System.SByte)">
-            <summary>
-            Create a new SmtpState object. Private to ensure that only valid states can be created.
-            </summary>
-            <param name="state">one of the _BYTE values.</param>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpState.ToString">
-            <summary>
-            String representation of this SmtpState.
-            </summary>
-            <returns>A String that represents the current SmtpState</returns>
-        </member>
-        <member name="T:nDumbster.Smtp.SmtpRequest">
-            <summary>
-            Contains an SMTP client request and handles state transitions.
-            </summary>
-            <remarks>
-            State transitions are handled using the following state transition table.
-            <code>
-            -----------+-------------------------------------------------------------------------------------------------
-            |                                 State
-            Action     +-------------+-----------+-----------+--------------+---------------+---------------+------------
-            		   | CONNECT     | GREET     | MAIL      | RCPT         | DATA_HDR      | DATA_BODY     | QUIT
-            -----------+-------------+-----------+-----------+--------------+---------------+---------------+------------
-            connect    | 220/GREET   | 503/GREET | 503/MAIL  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
-            ehlo       | 503/CONNECT | 250/MAIL  | 503/MAIL  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
-            mail       | 503/CONNECT | 503/GREET | 250/RCPT  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 250/RCPT
-            rcpt       | 503/CONNECT | 503/GREET | 503/MAIL  | 250/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
-            data       | 503/CONNECT | 503/GREET | 503/MAIL  | 354/DATA_HDR | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
-            data_end   | 503/CONNECT | 503/GREET | 503/MAIL  | 503/RCPT     | 250/QUIT      | 250/QUIT      | 503/QUIT
-            unrecog    | 500/CONNECT | 500/GREET | 500/MAIL  | 500/RCPT     | ---/DATA_HDR  | ---/DATA_BODY | 500/QUIT
-            quit       | 503/CONNECT | 503/GREET | 503/MAIL  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 250/CONNECT
-            blank_line | 503/CONNECT | 503/GREET | 503/MAIL  | 503/RCPT     | ---/DATA_BODY | ---/DATA_BODY | 503/QUIT
-            rset       | 250/GREET   | 250/GREET | 250/GREET | 250/GREET    | 250/GREET     | 250/GREET     | 250/GREET
-            vrfy       | 252/CONNECT | 252/GREET | 252/MAIL  | 252/RCPT     | 252/DATA_HDR  | 252/DATA_BODY | 252/QUIT
-            expn       | 252/CONNECT | 252/GREET | 252/MAIL  | 252/RCPT     | 252/DATA_HDR  | 252/DATA_BODY | 252/QUIT
-            help       | 211/CONNECT | 211/GREET | 211/MAIL  | 211/RCPT     | 211/DATA_HDR  | 211/DATA_BODY | 211/QUIT
-            noop       | 250/CONNECT | 250/GREET | 250/MAIL  | 250/RCPT     | 250|DATA_HDR  | 250/DATA_BODY | 250/QUIT
-            </code>
-            </remarks>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpRequest.action">
-            <summary>
-            SMTP action received from client. 
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpRequest.state">
-            <summary>
-            Current state of the SMTP state table. 
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpRequest.request_Params">
-            <summary>
-            Additional information passed from the client with the SMTP action. 
-            </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpRequest.#ctor(nDumbster.Smtp.SmtpActionType,System.String,nDumbster.Smtp.SmtpState)">
-            <summary> 
-            Create a new SMTP client request.
-            </summary>
-            <param name="actionType">type of action/command</param>
-            <param name="request_Params">remainder of command line once command is removed</param>
-            <param name="state">current SMTP server state</param>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpRequest.Execute">
-            <summary> 
-            Execute the SMTP request returning a response. This method models the state transition table for the SMTP server.
-            </summary>
-            <returns>Reponse to the request</returns>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpRequest.CreateRequest(System.String,nDumbster.Smtp.SmtpState)">
-            <summary>
-             Create an SMTP request object given a line of the input stream from the client and the current internal state.
+        <member name="T:nDumbster.Smtp.SimpleSmtpServer">
+             <summary>
+             Dummy SMTP server for testing purposes.
              </summary>
-            <param name="s">line of input</param>
-            <param name="state">current state</param>
-            <returns>A populated SmtpRequest object</returns>
+             <example>
+             The following examples shows how to use nDumbster and <see href="http://www.nunit.org">NUnit</see> to test your function sendMessage.
+             <code>
+            	[TestFixture]
+            	public class SimpleSmtpServerTest
+            	{
+            		SimpleSmtpServer smtpServer;
+            
+            		[SetUp]
+            		public void Setup()
+            		{
+            
+            			smtpServer = SimpleSmtpServer.Start();
+            
+            		}
+            
+            		[TearDown]
+            		public void TearDown()
+            		{
+            			smtpServer.Stop();
+            		}
+            
+            		[Test]
+            		public void SendEmail()
+            		{
+            			/// Use you own code 
+            			sendMessage(25, "sender@here.com", "Test", "Test Body", "receiver@there.com");
+            			Assert.AreEqual(1, smtpServer.ReceivedEmailCount, "1 mails sent");
+            			SmtpMessage mail= (SmtpMessage)smtpServer.ReceivedEmail[0];
+            			Assert.AreEqual("&lt;receiver@there.com&gt;", mail.Headers["To"], "Receiver");
+            			Assert.AreEqual("&lt;sender@here.com&gt;", mail.Headers["From"], "Sender");
+            			Assert.AreEqual("Test", mail.Headers["Subject"], "Subject");
+            
+            			Assert.AreEqual("Test Body", mailUser.Body, "Body");
+            		}
+            	}
+            	</code>
+             </example>
+             <threadsafety static="true" instance="true">
+            	<para>The server create a thread to handle message reception and all access to messages list is protected.</para>
+             </threadsafety>
         </member>
-        <member name="P:nDumbster.Smtp.SmtpRequest.Params">
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer.DEFAULT_SMTP_PORT">
             <summary>
-            Parameters of this request (remainder of command line once the command is removed.
+            Default SMTP port is 25.
             </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer.port">
+            <summary>
+            Stores the port that the SmtpServer listens to
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer._receivedMail">
+            <summary>
+            Stores all of the email received since this instance started up.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer._stopped">
+            <summary>
+            Indicates whether this server is stopped or not.
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer.TcpListener">
+            <summary>
+            Listen for client connection
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer.StartedEvent">
+            <summary>
+            Synchronization <see cref="T:System.Threading.AutoResetEvent">event</see> : Set when server has started (successfully or not)
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SimpleSmtpServer.MainThreadException">
+            <summary>
+            Last <see cref="T:System.Exception">Exception</see> that happened in main loop thread
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.#ctor(System.Int32)">
+            <summary>
+            Constructor.
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.ClearReceivedEmail">
+            <summary>
+            Erase list of received emails
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Run">
+            <summary>
+            Main loop of the SMTP server.
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.HandleSmtpTransaction(System.IO.StreamWriter,System.IO.TextReader)">
+            <summary>
+            Handle an SMTP transaction, i.e. all activity between initial connect and QUIT command.
+            </summary>
+            <param name="output">output stream</param>
+            <param name="input">input stream</param>
+            <param name="messageQueue">The message queue to add any messages to</param>
+            <returns>List of received SmtpMessages</returns>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.SendResponse(System.IO.StreamWriter,nDumbster.Smtp.SmtpResponse)">
+            <summary>
+            Send response to client.
+            </summary>
+            <param name="output">socket output stream</param>
+            <param name="smtpResponse">Response to send</param>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Stop">
+            <summary>
+            Forces the server to stop after processing the current request.
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Start">
+            <overloads>
+            Creates an instance of SimpleSmtpServer and starts it.
+            </overloads>
+            <summary>
+            Creates and starts an instance of SimpleSmtpServer that will listen on the default port.
+            </summary>
+            <returns>The <see cref="T:nDumbster.Smtp.SimpleSmtpServer">SmtpServer</see> waiting for message</returns>
+        </member>
+        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Start(System.Int32,System.Boolean)">
+            <summary>
+            Creates and starts an instance of SimpleSmtpServer that will listen on a specific port.
+            </summary>
+            <param name="port">port number the server should listen to</param>
+            <param name="background">Whether listener thread blocks process from shutdown</param>
+            <returns>The <see cref="T:nDumbster.Smtp.SimpleSmtpServer">SmtpServer</see> waiting for message</returns>
+        </member>
+        <member name="P:nDumbster.Smtp.SimpleSmtpServer.Stopped">
+            <summary>
+            Indicates whether this server is stopped or not.
+            </summary>
+            <value><see langword="true"/> if the server is stopped</value>
+        </member>
+        <member name="P:nDumbster.Smtp.SimpleSmtpServer.Port">
+            <summary>
+            The port that the SmtpServer listens to
+            </summary>
+            <value>Port used to accept client connections</value>
+        </member>
+        <member name="P:nDumbster.Smtp.SimpleSmtpServer.ReceivedEmail">
+            <summary>
+            List of email received by this instance since start up.
+            </summary>
+            <value><see cref="T:System.Array">Array</see> holding received <see cref="T:nDumbster.Smtp.SmtpMessage">SmtpMessage</see></value>
+        </member>
+        <member name="P:nDumbster.Smtp.SimpleSmtpServer.ReceivedEmailCount">
+            <summary>
+            Number of messages received by this instance since start up.
+            </summary>
+            <value>Number of messages</value>
         </member>
         <member name="T:nDumbster.Smtp.SmtpActionType">
             <summary> Represents an SMTP action or command.</summary>
@@ -301,49 +326,6 @@
             Indicates whether the action is stateless or not.
             </summary>
         </member>
-        <member name="T:nDumbster.Smtp.SmtpResponse">
-            <summary>
-            SMTP response container.
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpResponse.code">
-            <summary>
-            Response code - see RFC-2821. 
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpResponse.message">
-            <summary>
-            Response message. 
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SmtpResponse.nextState">
-            <summary>
-            New state of the SMTP server once the request has been executed. 
-            </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SmtpResponse.#ctor(System.Int32,System.String,nDumbster.Smtp.SmtpState)">
-            <summary>
-            Constructor.
-            </summary>
-            <param name="code">response code</param>
-            <param name="message">response message</param>
-            <param name="next">next state of the SMTP server</param>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpResponse.Code">
-            <summary> 
-            Response code.
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpResponse.Message">
-            <summary> 
-            Response message.
-            </summary>
-        </member>
-        <member name="P:nDumbster.Smtp.SmtpResponse.NextState">
-            <summary>
-            Next SMTP server state.
-            </summary>
-        </member>
         <member name="T:nDumbster.Smtp.SmtpMessage">
             <summary>
             Container for a complete SMTP message - headers and message body.
@@ -417,163 +399,181 @@
             Headers of the message.
             </summary>
         </member>
-        <member name="T:nDumbster.Smtp.SimpleSmtpServer">
-             <summary>
-             Dummy SMTP server for testing purposes.
+        <member name="T:nDumbster.Smtp.SmtpRequest">
+            <summary>
+            Contains an SMTP client request and handles state transitions.
+            </summary>
+            <remarks>
+            State transitions are handled using the following state transition table.
+            <code>
+            -----------+-------------------------------------------------------------------------------------------------
+            |                                 State
+            Action     +-------------+-----------+-----------+--------------+---------------+---------------+------------
+            		   | CONNECT     | GREET     | MAIL      | RCPT         | DATA_HDR      | DATA_BODY     | QUIT
+            -----------+-------------+-----------+-----------+--------------+---------------+---------------+------------
+            connect    | 220/GREET   | 503/GREET | 503/MAIL  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
+            ehlo       | 503/CONNECT | 250/MAIL  | 503/MAIL  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
+            mail       | 503/CONNECT | 503/GREET | 250/RCPT  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 250/RCPT
+            rcpt       | 503/CONNECT | 503/GREET | 503/MAIL  | 250/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
+            data       | 503/CONNECT | 503/GREET | 503/MAIL  | 354/DATA_HDR | 503/DATA_HDR  | 503/DATA_BODY | 503/QUIT
+            data_end   | 503/CONNECT | 503/GREET | 503/MAIL  | 503/RCPT     | 250/QUIT      | 250/QUIT      | 503/QUIT
+            unrecog    | 500/CONNECT | 500/GREET | 500/MAIL  | 500/RCPT     | ---/DATA_HDR  | ---/DATA_BODY | 500/QUIT
+            quit       | 503/CONNECT | 503/GREET | 503/MAIL  | 503/RCPT     | 503/DATA_HDR  | 503/DATA_BODY | 250/CONNECT
+            blank_line | 503/CONNECT | 503/GREET | 503/MAIL  | 503/RCPT     | ---/DATA_BODY | ---/DATA_BODY | 503/QUIT
+            rset       | 250/GREET   | 250/GREET | 250/GREET | 250/GREET    | 250/GREET     | 250/GREET     | 250/GREET
+            vrfy       | 252/CONNECT | 252/GREET | 252/MAIL  | 252/RCPT     | 252/DATA_HDR  | 252/DATA_BODY | 252/QUIT
+            expn       | 252/CONNECT | 252/GREET | 252/MAIL  | 252/RCPT     | 252/DATA_HDR  | 252/DATA_BODY | 252/QUIT
+            help       | 211/CONNECT | 211/GREET | 211/MAIL  | 211/RCPT     | 211/DATA_HDR  | 211/DATA_BODY | 211/QUIT
+            noop       | 250/CONNECT | 250/GREET | 250/MAIL  | 250/RCPT     | 250|DATA_HDR  | 250/DATA_BODY | 250/QUIT
+            </code>
+            </remarks>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpRequest.action">
+            <summary>
+            SMTP action received from client. 
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpRequest.state">
+            <summary>
+            Current state of the SMTP state table. 
+            </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpRequest.request_Params">
+            <summary>
+            Additional information passed from the client with the SMTP action. 
+            </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpRequest.#ctor(nDumbster.Smtp.SmtpActionType,System.String,nDumbster.Smtp.SmtpState)">
+            <summary> 
+            Create a new SMTP client request.
+            </summary>
+            <param name="actionType">type of action/command</param>
+            <param name="request_Params">remainder of command line once command is removed</param>
+            <param name="state">current SMTP server state</param>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpRequest.Execute">
+            <summary> 
+            Execute the SMTP request returning a response. This method models the state transition table for the SMTP server.
+            </summary>
+            <returns>Reponse to the request</returns>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpRequest.CreateRequest(System.String,nDumbster.Smtp.SmtpState)">
+            <summary>
+             Create an SMTP request object given a line of the input stream from the client and the current internal state.
              </summary>
-             <example>
-             The following examples shows how to use nDumbster and <see href="http://www.nunit.org">NUnit</see> to test your function sendMessage.
-             <code>
-            	[TestFixture]
-            	public class SimpleSmtpServerTest
-            	{
-            		SimpleSmtpServer smtpServer;
-            
-            		[SetUp]
-            		public void Setup()
-            		{
-            
-            			smtpServer = SimpleSmtpServer.Start();
-            
-            		}
-            
-            		[TearDown]
-            		public void TearDown()
-            		{
-            			smtpServer.Stop();
-            		}
-            
-            		[Test]
-            		public void SendEmail()
-            		{
-            			/// Use you own code 
-            			sendMessage(25, "sender@here.com", "Test", "Test Body", "receiver@there.com");
-            			Assert.AreEqual(1, smtpServer.ReceivedEmailCount, "1 mails sent");
-            			SmtpMessage mail= (SmtpMessage)smtpServer.ReceivedEmail[0];
-            			Assert.AreEqual("&lt;receiver@there.com&gt;", mail.Headers["To"], "Receiver");
-            			Assert.AreEqual("&lt;sender@here.com&gt;", mail.Headers["From"], "Sender");
-            			Assert.AreEqual("Test", mail.Headers["Subject"], "Subject");
-            
-            			Assert.AreEqual("Test Body", mailUser.Body, "Body");
-            		}
-            	}
-            	</code>
-             </example>
-             <threadsafety static="true" instance="true">
-            	<para>The server create a thread to handle message reception and all access to messages list is protected.</para>
-             </threadsafety>
+            <param name="s">line of input</param>
+            <param name="state">current state</param>
+            <returns>A populated SmtpRequest object</returns>
         </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer.DEFAULT_SMTP_PORT">
+        <member name="P:nDumbster.Smtp.SmtpRequest.Params">
             <summary>
-            Default SMTP port is 25.
+            Parameters of this request (remainder of command line once the command is removed.
             </summary>
         </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer.port">
+        <member name="T:nDumbster.Smtp.SmtpResponse">
             <summary>
-            Stores the port that the SmtpServer listens to
+            SMTP response container.
             </summary>
         </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer._receivedMail">
+        <member name="F:nDumbster.Smtp.SmtpResponse.code">
             <summary>
-            Stores all of the email received since this instance started up.
+            Response code - see RFC-2821. 
             </summary>
         </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer._stopped">
+        <member name="F:nDumbster.Smtp.SmtpResponse.message">
             <summary>
-            Indicates whether this server is stopped or not.
+            Response message. 
             </summary>
         </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer.TcpListener">
+        <member name="F:nDumbster.Smtp.SmtpResponse.nextState">
             <summary>
-            Listen for client connection
+            New state of the SMTP server once the request has been executed. 
             </summary>
         </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer.StartedEvent">
-            <summary>
-            Synchronization <see cref="T:System.Threading.AutoResetEvent">event</see> : Set when server has started (successfully or not)
-            </summary>
-        </member>
-        <member name="F:nDumbster.Smtp.SimpleSmtpServer.MainThreadException">
-            <summary>
-            Last <see cref="T:System.Exception">Exception</see> that happened in main loop thread
-            </summary>
-        </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.#ctor(System.Int32)">
+        <member name="M:nDumbster.Smtp.SmtpResponse.#ctor(System.Int32,System.String,nDumbster.Smtp.SmtpState)">
             <summary>
             Constructor.
             </summary>
+            <param name="code">response code</param>
+            <param name="message">response message</param>
+            <param name="next">next state of the SMTP server</param>
         </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.ClearReceivedEmail">
-            <summary>
-            Erase list of received emails
+        <member name="P:nDumbster.Smtp.SmtpResponse.Code">
+            <summary> 
+            Response code.
             </summary>
         </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Run">
-            <summary>
-            Main loop of the SMTP server.
+        <member name="P:nDumbster.Smtp.SmtpResponse.Message">
+            <summary> 
+            Response message.
             </summary>
         </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.HandleSmtpTransaction(System.IO.StreamWriter,System.IO.TextReader)">
+        <member name="P:nDumbster.Smtp.SmtpResponse.NextState">
             <summary>
-            Handle an SMTP transaction, i.e. all activity between initial connect and QUIT command.
-            </summary>
-            <param name="output">output stream</param>
-            <param name="input">input stream</param>
-            <param name="messageQueue">The message queue to add any messages to</param>
-            <returns>List of received SmtpMessages</returns>
-        </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.SendResponse(System.IO.StreamWriter,nDumbster.Smtp.SmtpResponse)">
-            <summary>
-            Send response to client.
-            </summary>
-            <param name="output">socket output stream</param>
-            <param name="smtpResponse">Response to send</param>
-        </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Stop">
-            <summary>
-            Forces the server to stop after processing the current request.
+            Next SMTP server state.
             </summary>
         </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Start">
-            <overloads>
-            Creates an instance of SimpleSmtpServer and starts it.
-            </overloads>
-            <summary>
-            Creates and starts an instance of SimpleSmtpServer that will listen on the default port.
+        <member name="T:nDumbster.Smtp.SmtpState">
+            <summary> 
+            SMTP server state.
             </summary>
-            <returns>The <see cref="T:nDumbster.Smtp.SimpleSmtpServer">SmtpServer</see> waiting for message</returns>
         </member>
-        <member name="M:nDumbster.Smtp.SimpleSmtpServer.Start(System.Int32,System.Boolean)">
-            <summary>
-            Creates and starts an instance of SimpleSmtpServer that will listen on a specific port.
-            </summary>
-            <param name="port">port number the server should listen to</param>
-            <param name="background">Whether listener thread blocks process from shutdown</param>
-            <returns>The <see cref="T:nDumbster.Smtp.SimpleSmtpServer">SmtpServer</see> waiting for message</returns>
+        <member name="F:nDumbster.Smtp.SmtpState.CONNECT_BYTE">
+            <summary>Internal representation of the CONNECT state. </summary>
         </member>
-        <member name="P:nDumbster.Smtp.SimpleSmtpServer.Stopped">
-            <summary>
-            Indicates whether this server is stopped or not.
-            </summary>
-            <value><see langword="true"/> if the server is stopped</value>
+        <member name="F:nDumbster.Smtp.SmtpState.GREET_BYTE">
+            <summary>Internal representation of the GREET state. </summary>
         </member>
-        <member name="P:nDumbster.Smtp.SimpleSmtpServer.Port">
-            <summary>
-            The port that the SmtpServer listens to
-            </summary>
-            <value>Port used to accept client connections</value>
+        <member name="F:nDumbster.Smtp.SmtpState.MAIL_BYTE">
+            <summary>Internal representation of the MAIL state. </summary>
         </member>
-        <member name="P:nDumbster.Smtp.SimpleSmtpServer.ReceivedEmail">
-            <summary>
-            List of email received by this instance since start up.
-            </summary>
-            <value><see cref="T:System.Array">Array</see> holding received <see cref="T:nDumbster.Smtp.SmtpMessage">SmtpMessage</see></value>
+        <member name="F:nDumbster.Smtp.SmtpState.RCPT_BYTE">
+            <summary>Internal representation of the RCPT state. </summary>
         </member>
-        <member name="P:nDumbster.Smtp.SimpleSmtpServer.ReceivedEmailCount">
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_HEADER_BYTE">
+            <summary>Internal representation of the DATA_HEADER state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY_BYTE">
+            <summary>Internal representation of the DATA_BODY state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.QUIT_BYTE">
+            <summary>Internal representation of the QUIT state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.state">
+            <summary>Internal representation of the state. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.CONNECT">
+            <summary>CONNECT state: waiting for a client connection. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.GREET">
+            <summary>GREET state: wating for a ELHO message. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.MAIL">
+            <summary>MAIL state: waiting for the MAIL FROM: command. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.RCPT">
+            <summary>RCPT state: waiting for a RCPT &lt;email address&gt; command. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_HDR">
+            <summary>Waiting for headers. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.DATA_BODY">
+            <summary>Processing body text. </summary>
+        </member>
+        <member name="F:nDumbster.Smtp.SmtpState.QUIT">
+            <summary>End of client transmission. </summary>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpState.#ctor(System.SByte)">
             <summary>
-            Number of messages received by this instance since start up.
+            Create a new SmtpState object. Private to ensure that only valid states can be created.
             </summary>
-            <value>Number of messages</value>
+            <param name="state">one of the _BYTE values.</param>
+        </member>
+        <member name="M:nDumbster.Smtp.SmtpState.ToString">
+            <summary>
+            String representation of this SmtpState.
+            </summary>
+            <returns>A String that represents the current SmtpState</returns>
         </member>
     </members>
 </doc>
