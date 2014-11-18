@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nDumbster", "nDumbster\nDumbster.csproj", "{C212524F-7E3A-4B15-9038-5B5A661FE913}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nDumbster.Tests", "nDumbster.Tests\nDumbster.Tests.csproj", "{7E1D781E-00A9-441D-9203-2BDD45E6A963}"
